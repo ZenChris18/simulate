@@ -5,11 +5,12 @@ from utils.visualizer import StealthVisualizer
 def main():
     pygame.init()
     screen = pygame.display.set_mode((800, 800))
-    simulation = StealthSimulation(world_size=20)
-    clock = pygame.time.Clock()  # Add this
+    simulation = StealthSimulation(world_size=32)
+    clock = pygame.time.Clock() 
     
     running = True
     while running:
+        clock.tick(60)
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -22,10 +23,9 @@ def main():
         StealthVisualizer.render(screen, 
                                simulation.world,
                                simulation.player_pos,
-                               simulation.guard_pos)
+                               simulation.guard_pos,
+                               simulation.guard.facing)
         pygame.display.flip()
-        
-        clock.tick(10)  # Control FPS here
 
     pygame.quit()
 

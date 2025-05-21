@@ -7,7 +7,6 @@ class StealthWorld:
         self._generate_map()
         
     def _generate_map(self):
-        # Generate rooms and walls
         self.grid.fill(0)
         # Add perimeter walls
         self.grid[0,:] = 2
@@ -15,13 +14,27 @@ class StealthWorld:
         self.grid[:,0] = 2
         self.grid[:,-1] = 2
         
-        # Add random rooms
+        # Create rooms with walls
         for _ in range(4):
-            x = np.random.randint(1, self.size-4)
-            y = np.random.randint(1, self.size-4)
+            # Random room position with walls
+            x = np.random.randint(2, self.size-6)
+            y = np.random.randint(2, self.size-6)
             w = np.random.randint(3, 6)
             h = np.random.randint(3, 6)
-            self.grid[x:x+w, y:y+h] = 1  # Mark as room
+            
+            # Walls around room
+            self.grid[x-1:x+w+1, y-1] = 2  # Left wall
+            self.grid[x-1:x+w+1, y+h] = 2  # Right wall
+            self.grid[x-1, y-1:y+h+1] = 2  # Top wall
+            self.grid[x+w, y-1:y+h+1] = 2  # Bottom wall
+            
+            # Room floor
+            self.grid[x:x+w, y:y+h] = 1
+            
+            # Add doorway
+            door_x = x + np.random.randint(1, w-1)
+            door_y = y + np.random.randint(1, h-1)
+            self.grid[door_x, door_y] = 0
             
     def change_layout(self):
         self._generate_map()

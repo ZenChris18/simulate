@@ -18,20 +18,25 @@ class StealthSimulation:
         self.episode = 0
         
     def hybrid_loop(self):
-        # REMOVE the while running loop here!
-        # Process single frame
-        
-        # Handle events (already handled in main loop)
-        # Process input and update game state
         self._handle_input()
         
         # Update visibility and AI
         visible = StealthSystem.calculate_visibility(
             self.guard_pos, 
             self.player_pos,
-            self.world.grid
+            self.world.grid,
+            self.guard.facing
         )
-        
+        if visible:
+            self.last_seen_pos = self.player_pos
+            self.time_since_seen = 0
+            self.guard.searching = False
+        else:
+            self.time_since_seen += 1
+            # if we just lost sight, start searching
+            if self.time_since_seen == 1:
+                self.guard.searching = True
+
         # Get and execute guard action
         state = self.guard.get_state(
             self.player_pos,
@@ -39,7 +44,7 @@ class StealthSimulation:
             self.time_since_seen,
             self._in_room(self.player_pos)
         )
-        action = self.guard.get_action(state)
+        action = self.guard.get_action(state, self.guard_pos, self.last_seen_pos)
         self._execute_guard_action(action)
         
         # Update Q-values
@@ -98,8 +103,9 @@ class StealthSimulation:
         return self.world.grid[pos] == 1
     
     def _execute_guard_action(self, action):
-        """Convert action to movement (preserving your original movement logic)"""
         new_pos = list(self.guard_pos)
+
+        self.guard.facing = action
         
         # Action mapping (same as your original: 0=up, 1=down, 2=left, 3=right)
         if action == 0:  # Up
@@ -117,13 +123,17 @@ class StealthSimulation:
         
     def _calculate_reward(self, visible):
         if self._player_caught():
-            return 100  # Bigger catch reward
+            return 100
         elif visible:
-            return 20 * (1 + self.current_level/5)  # Scale with level
+            # Add distance-based reward
+            dx = abs(self.guard_pos[0] - self.player_pos[0])
+            dy = abs(self.guard_pos[1] - self.player_pos[1])
+            distance_reward = (20 - (dx + dy)) * 2  # Closer = higher reward
+            return 20 + distance_reward
         elif self._idle_too_long():
-            return -5  # Stronger penalty for inactivity
+            return -10
         else:
-            return -0.5
+            return -1
         
 
 
