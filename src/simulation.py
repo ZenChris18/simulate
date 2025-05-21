@@ -1,4 +1,3 @@
-from world_generator import generate_world
 import numpy as np
 
 def run_episode(world, agent, max_steps=100, episode=0):

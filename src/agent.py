@@ -21,5 +21,5 @@ class Explorer:
         next_x, next_y = next_state
         old_value = self.q_table[x][y][action]
         max_future = np.max(self.q_table[next_x][next_y])
-        new_value = old_value + 0.5 * (reward + 0.95 * max_future - old_value)  # α=0.5, γ=0.95
+        new_value = old_value + 0.5 * (reward + 0.95 * max_future - old_value)  # α=0.5, γ=0.95 formula for the algorithm
         self.q_table[x][y][action] = new_value
