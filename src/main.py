@@ -10,7 +10,7 @@ world = generate_world(size=world_size)
 agent = Explorer(grid_size=world_size)
 pygame.init()
 screen = pygame.display.set_mode((400, 400))
-number_of_episodes = 100 # number of tries the agent will do to learn
+number_of_episodes = 300 # number of tries the agent will do to learn
 
 # Training loop
 for episode in range(number_of_episodes):
