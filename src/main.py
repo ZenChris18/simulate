@@ -1,29 +1,33 @@
 import pygame
-from simulation import run_episode
-from world_generator import generate_world
-from visualize import render
-from agent import Explorer
+from game.simulation import StealthSimulation
+from utils.visualizer import StealthVisualizer
 
-# Initialize
-world_size = 100 # Size of the world and agent
-world = generate_world(size=world_size)
-agent = Explorer(grid_size=world_size)
-pygame.init()
-screen = pygame.display.set_mode((400, 400))
-number_of_episodes = 100 # number of tries the agent will do to learn
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((800, 800))
+    simulation = StealthSimulation(world_size=20)
+    clock = pygame.time.Clock()  # Add this
+    
+    running = True
+    while running:
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        
+        # Run single iteration
+        simulation.hybrid_loop()
+        
+        # Render
+        StealthVisualizer.render(screen, 
+                               simulation.world,
+                               simulation.player_pos,
+                               simulation.guard_pos)
+        pygame.display.flip()
+        
+        clock.tick(10)  # Control FPS here
 
-# Training loop
-for episode in range(number_of_episodes):
-    # world = generate_world(size=world_size)  # Regenerate world for each episode remove if want to keep the same world
-    total_reward, final_x, final_y = run_episode(world, agent, episode=episode)
-    agent.epsilon = max(agent.epsilon_min, agent.epsilon * agent.epsilon_decay)
-    if total_reward < 100 and episode > 30:
-        agent.epsilon = min(0.5, agent.epsilon + 0.1)
+    pygame.quit()
 
-    print(f"Episode {episode}: Reward = {total_reward}")
-
-    # Render once per episode so i can see
-    render(screen, world, (final_x, final_y)) 
-    pygame.display.update()
-
-pygame.quit()
+if __name__ == "__main__":
+    main()
