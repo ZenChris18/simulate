@@ -1,5 +1,5 @@
 # simulate
-1. create venv
+1. create venv (linux - source venv/bin/activate, windows- venv/scripts/activate)
 2. install dependencies
 3. run main.py
 
